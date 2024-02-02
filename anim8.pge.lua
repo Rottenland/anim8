@@ -1,6 +1,6 @@
 local anim8 = {
   _VERSION     = 'anim8 v2.3.1',
-  _DESCRIPTION = 'An animation library for LÖVE',
+  _DESCRIPTION = 'An animation library for PGELUA 0.2',
   _URL         = 'https://github.com/kikito/anim8',
   _LICENSE     = [[
     MIT LICENSE
@@ -35,11 +35,12 @@ local _frames = {}
 local function assertPositiveInteger(value, name)
   if type(value) ~= 'number' then error(("%s should be a number, was %q"):format(name, tostring(value))) end
   if value < 1 then error(("%s should be a positive number, was %d"):format(name, value)) end
-  if value ~= math.floor(value) then error(("%s should be an integer, was %f"):format(name, value)) end
+  if value ~= pge.math.floor(value) then error(("%s should be an integer, was %f"):format(name, value)) end
 end
 
 local function createFrame(self, x, y)
   local fw, fh = self.frameWidth, self.frameHeight
+  -- TODO: Replace love.graphics.quad with some sort of PGELUA thing
   return love.graphics.newQuad(
     self.left + (x-1) * fw + x * self.border,
     self.top  + (y-1) * fh + y * self.border,
@@ -227,7 +228,7 @@ function Animation:update(dt)
   if self.status ~= "playing" then return end
 
   self.timer = self.timer + dt
-  local loops = math.floor(self.timer / self.totalDuration)
+  local loops = pge.math.floor(self.timer / self.totalDuration)
   if loops ~= 0 then
     self.timer = self.timer - self.totalDuration * loops
     local f = type(self.onLoop) == 'function' and self.onLoop or self[self.onLoop]
@@ -263,6 +264,7 @@ function Animation:resume()
 end
 
 function Animation:draw(image, x, y, r, sx, sy, ox, oy, kx, ky)
+  -- TODO: replace with pgelua equivalent
   love.graphics.draw(image, self:getFrameInfo(x, y, r, sx, sy, ox, oy, kx, ky))
 end
 
@@ -270,6 +272,7 @@ function Animation:getFrameInfo(x, y, r, sx, sy, ox, oy, kx, ky)
   local frame = self.frames[self.position]
   if self.flippedH or self.flippedV then
     r,sx,sy,ox,oy,kx,ky = r or 0, sx or 1, sy or 1, ox or 0, oy or 0, kx or 0, ky or 0
+    -- FIXME: frame?
     local _,_,w,h = frame:getViewport()
 
     if self.flippedH then
